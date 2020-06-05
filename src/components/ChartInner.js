@@ -81,32 +81,31 @@ function ChartInner({ handleRef, className, style = {}, ...rest }) {
     [offset, gridX, gridY]
   )
 
-  const onTouchMove = e => {
-    if (rafRef.current) {
-      Raf.cancel(rafRef.current)
-    }
-    rafRef.current = Raf(() => {
-      rafRef.current = null
-      const { clientX, clientY } = e.targetTouches[0]
+  const onTouchMove = useMemo(
+    () =>
+      Utils.throttle(e => {
+        const { clientX, clientY } = e.targetTouches[0]
 
-      setChartState(state => {
-        const x = clientX - offset.left - gridX
-        const y = clientY - offset.top - gridY
+        setChartState(state => {
+          const x = clientX - offset.left - gridX
+          const y = clientY - offset.top - gridY
 
-        const pointer = {
-          ...state.pointer,
-          active: true,
-          x,
-          y,
-          dragging: state.pointer && state.pointer.down,
-        }
-        return {
-          ...state,
-          pointer,
-        }
-      })
-    })
-  }
+          const pointer = {
+            ...state.pointer,
+            active: true,
+            x,
+            y,
+            dragging: state.pointer && state.pointer.down
+          }
+          return {
+            ...state,
+            pointer
+          }
+        })
+      }),
+    [offset, gridX, gridY]
+  )
+
 
   const onTouchStart = (e) => {
     document.addEventListener('touchend', onTouchEnd)
