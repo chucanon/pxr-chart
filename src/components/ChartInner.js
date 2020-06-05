@@ -81,6 +81,68 @@ function ChartInner({ handleRef, className, style = {}, ...rest }) {
     [offset, gridX, gridY]
   )
 
+  const onTouchMove = e => {
+    if (rafRef.current) {
+      Raf.cancel(rafRef.current)
+    }
+    rafRef.current = Raf(() => {
+      rafRef.current = null
+      const { clientX, clientY } = e.targetTouches[0]
+
+      setChartState(state => {
+        const x = clientX - offset.left - gridX
+        const y = clientY - offset.top - gridY
+
+        const pointer = {
+          ...state.pointer,
+          active: true,
+          x,
+          y,
+          dragging: state.pointer && state.pointer.down,
+        }
+        return {
+          ...state,
+          pointer,
+        }
+      })
+    })
+  }
+
+  const onTouchStart = (e) => {
+    document.addEventListener('touchend', onTouchEnd)
+    document.addEventListener('touchmove', onTouchMove)
+
+    const { clientX, clientY } = e.targetTouches[0]
+    const x = clientX - offset.left - gridX
+    const y = clientY - offset.top - gridY
+    setChartState(state => ({
+      ...state,
+      pointer: {
+        ...state.pointer,
+        sourceX: x,
+        sourceY: y,
+        down: true,
+      },
+    }))
+  }
+
+  const onTouchEnd = () => {
+    document.removeEventListener('touchend', onTouchEnd)
+    document.removeEventListener('touchmove', onTouchMove)
+    setChartState(state => ({
+      ...state,
+      pointer: {
+        ...state.pointer,
+        down: false,
+        dragging: false,
+        released: {
+          x: state.pointer.x,
+          y: state.pointer.y,
+        },
+      },
+    }))
+  }
+
   const onMouseLeave = () => {
     setChartState(state => ({
       ...state,
@@ -189,6 +251,10 @@ function ChartInner({ handleRef, className, style = {}, ...rest }) {
           }}
           onMouseLeave={onMouseLeave}
           onMouseDown={onMouseDown}
+          onTouchStart={e => {
+            e.persist()
+            onTouchStart(e)
+          }}
           onClick={onClick}
           style={{
             transform: Utils.translate(gridX, gridY)
