@@ -85,10 +85,10 @@ function ChartInner({ handleRef, className, style = {}, ...rest }) {
     () =>
       Utils.throttle(e => {
         const { clientX, clientY } = e.targetTouches[0]
-
+        const current = elRef.current.getBoundingClientRect()
         setChartState(state => {
-          const x = clientX - offset.left - gridX
-          const y = clientY - offset.top - gridY
+          const x = clientX - current.left - gridX
+          const y = clientY - current.top - gridY
 
           const pointer = {
             ...state.pointer,
@@ -110,10 +110,10 @@ function ChartInner({ handleRef, className, style = {}, ...rest }) {
   const onTouchStart = (e) => {
     document.addEventListener('touchend', onTouchEnd)
     document.addEventListener('touchmove', onTouchMove)
-
+    const current = elRef.current.getBoundingClientRect()
     const { clientX, clientY } = e.targetTouches[0]
-    const x = clientX - offset.left - gridX
-    const y = clientY - offset.top - gridY
+    const x = clientX - current.left - gridX
+    const y = clientY - current.top - gridY
     setChartState(state => ({
       ...state,
       pointer: {
