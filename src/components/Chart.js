@@ -210,7 +210,7 @@ function Chart(
   useEffect(
     () => {
       if (brush && pointer.released) {
-        if (Math.abs(pointer.sourceX - pointer.x) < 20) {
+        if (Math.abs(pointer.sourceX - pointer.x) < 1) {
           return
         }
         brush.onSelect({

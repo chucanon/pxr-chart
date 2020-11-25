@@ -23,7 +23,7 @@ function Brush() {
         top: 0,
         transform: Utils.translate(gridX, gridY),
         opacity: pointer.dragging
-          ? Math.abs(pointer.sourceX - pointer.x) < 20
+          ? Math.abs(pointer.sourceX - pointer.x) < 1
             ? 0.5
             : 1
           : 0
