@@ -24,7 +24,8 @@ function Tooltip() {
     focused,
     lastFocused,
     getDatumStyle,
-    tooltip
+    tooltip,
+    pointer
   } = chartState
 
   if (!tooltip) {
@@ -42,7 +43,7 @@ function Tooltip() {
     anchor,
     show
   } = tooltip
-
+  const { axisValues: [axisX, axisY] } = pointer
   const elRef = useRef()
   const tooltipElRef = useRef()
 
@@ -307,6 +308,10 @@ function Tooltip() {
   const resolvedHorizontalPadding = padding + anchor.horizontalPadding
   const resolvedVerticalPadding = padding + anchor.verticalPadding
 
+  if(resolvedFocused) {
+    resolvedFocused.primary = axisX.value
+    resolvedFocused.secondary = axisY.value
+  }
   const renderProps = {
     ...chartState,
     datum: resolvedFocused,
@@ -338,7 +343,7 @@ function Tooltip() {
         width: `${gridWidth}px`,
         height: `${gridHeight}px`,
         opacity: show ? 1 : 0,
-        transition: 'all .3s ease'
+        // transition: 'all .3s ease'
       }}
       ref={el => {
         elRef.current = el
@@ -350,7 +355,7 @@ function Tooltip() {
           left: 0,
           top: 0,
           transform: Utils.translate(anchor.x, anchor.y),
-          transition: animateCoords ? 'all .2s ease' : 'opacity .2s ease'
+          // transition: animateCoords ? 'all .2s ease' : 'opacity .2s ease'
         }}
       >
         <div
@@ -360,7 +365,7 @@ function Tooltip() {
               resolvedVerticalPadding}px ${tooltipArrowPadding +
               resolvedHorizontalPadding}px`,
             width: 'auto',
-            transition: 'all .2s ease'
+            // transition: 'all .2s ease'
           }}
         >
           <div
@@ -382,7 +387,7 @@ function Tooltip() {
                 width: 0,
                 height: 0,
                 ...triangleStyles,
-                transition: animateCoords ? 'all .2s ease' : 'none'
+                // transition: animateCoords ? 'all .2s ease' : 'none'
               }}
             />
             {renderedChildren}

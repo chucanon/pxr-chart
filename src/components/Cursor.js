@@ -16,7 +16,7 @@ const getBackgroundColor = dark =>
 
 function Cursor({ primary }) {
   const [
-    { primaryCursor, secondaryCursor, focused, lastFocused, gridX, gridY, dark }
+    { primaryCursor, secondaryCursor, focused, lastFocused, gridX, gridY, dark, pointer }
   ] = useContext(ChartContext)
 
   const cursor = primary ? primaryCursor : secondaryCursor
@@ -38,7 +38,7 @@ function Cursor({ primary }) {
 
   const resolvedFocused = focused || lastFocused
   const lastValue = useWhen(resolvedValue, typeof resolvedValue !== 'undefined')
-
+  const { x: pointerX, y: pointerY, axisValues: [axisX, axisY] } = pointer
   // Should we animate?
   const animated = snap || axis.type === 'ordinal'
 
@@ -56,7 +56,7 @@ function Cursor({ primary }) {
 
   // Vertical alignment
   if (axis.vertical) {
-    y = axis.scale(lastValue)
+    y = pointerY
     x1 = siblingRange[0]
     x2 = siblingRange[1]
     y1 = y - 1
@@ -69,7 +69,7 @@ function Cursor({ primary }) {
       alignPctY = -50
     }
   } else {
-    x = axis.scale(lastValue)
+    x = pointerX
     x1 = x - 1
     x2 = x + axis.cursorSize + 1
     y1 = siblingRange[0]
@@ -91,14 +91,14 @@ function Cursor({ primary }) {
         ? axis.format(
           axis.stacked && !primary && resolvedFocused
             ? resolvedFocused.totalValue
-            : lastValue
+            : axisY.value
         )
         : ''
       : typeof lastValue !== 'undefined'
         ? axis.format(
           axis.stacked && !primary && resolvedFocused
             ? resolvedFocused.totalValue
-            : lastValue
+            : axisX.value
         )
         : ''
   )
@@ -130,7 +130,6 @@ function Cursor({ primary }) {
   }
 
   let renderedChildren = render(renderProps)
-
   return (
     <div
       style={{
@@ -154,9 +153,9 @@ function Cursor({ primary }) {
             transform: Utils.translate(lineStartX, lineStartY),
             width: `${lineWidth}px`,
             height: `${lineHeight}px`,
-            background: getLineBackgroundColor(dark),
-            transition:
-              animated && animateCoords ? 'all .2s ease' : 'opacity .2s ease'
+            background: getLineBackgroundColor(dark)
+            // transition:
+            //   animated && animateCoords ? 'all .2s ease' : 'opacity .2s ease'
           }}
         />
       ) : null}
@@ -167,9 +166,9 @@ function Cursor({ primary }) {
             position: 'absolute',
             top: 0,
             left: 0,
-            transform: Utils.translate(bubbleX, bubbleY),
-            transition:
-              animated && animateCoords ? 'all .2s ease' : 'opacity .2s ease'
+            transform: Utils.translate(bubbleX, bubbleY)
+            // transition:
+            //   animated && animateCoords ? 'all .2s ease' : 'opacity .2s ease'
           }}
         >
           {/* Render the cursor label */}
